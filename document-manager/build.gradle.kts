@@ -114,6 +114,9 @@ dependencies {
     implementation(libs.kotlinx.io.bytestring)
     implementation(libs.kotlinx.serialization.json)
 
+    //ebsi
+    implementation(libs.ktor.client.android)
+
     // CBOR
     implementation(libs.cbor)
     implementation(libs.cose)

@@ -68,16 +68,20 @@ internal fun addDataFromResponse(nameSpaces: CBORObject, response: String) {
         val json = Json { ignoreUnknownKeys = true }
         val jsonElement = json.parseToJsonElement(response)
 
-        // Navigate to eu.europa.ec.eudi.pid.1 data
-        val pidData = jsonElement.jsonObject["vcDocument"]
+        // Navigate to the correct data in the response
+        val credentialSubject = jsonElement.jsonObject["vcDocument"]
             ?.jsonObject?.get("credentialSubject")
-            ?.jsonObject?.get("eu.europa.ec.eudi.pid.1")
             ?.jsonObject
+        val nsData = when {
+            credentialSubject?.containsKey("eu.europa.ec.eudi.pid.1") == true -> credentialSubject["eu.europa.ec.eudi.pid.1"]?.jsonObject
+            credentialSubject?.containsKey("eu.europa.ec.eudi.educational_id.1") == true -> credentialSubject["eu.europa.ec.eudi.educational_id.1"]?.jsonObject
+            else -> null
+        }
 
-        if (pidData != null) {
+        if (nsData != null) {
             var currentDigestId = 1
 
-            for ((key, value) in pidData) {
+            for ((key, value) in nsData) {
                 val docData = CBORObject.NewMap()
                 docData.Set("elementIdentifier", key)
                 docData.Set("elementValue", CBORObject.FromObject((value as JsonPrimitive).contentOrNull))
